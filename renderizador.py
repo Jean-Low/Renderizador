@@ -500,6 +500,8 @@ class Procedure():
         #Debug and experimentation
         #I left these lines here to play a little with rotation and scale
         #and ultimately left the scale at 2.5, for visibility
+        #also, if you scale it by like, 10, and increase the resolution, you can have a more clear picture
+        #(specially usefull in the box on example 6)
         point = self.operation["Rotation"](point, [0,0,1,0])
         point = self.operation["Scale"](point, [2.5,2.5,2.5])
 
@@ -614,7 +616,6 @@ def triangleStripSet(point, stripCount, color):
     # em uma lista chamada stripCount (perceba que é uma lista).
 
     triangleSet(point, color)
-
     # O print abaixo é só para vocês verificarem o funcionamento, deve ser removido.
     print("TriangleStripSet : pontos = {0} ".format(point), end = '') # imprime no terminal pontos
     for i, strip in enumerate(stripCount):
@@ -625,7 +626,7 @@ def indexedTriangleStripSet(point, index, color):
     """ Função usada para renderizar IndexedTriangleStripSet. """
     # A função indexedTriangleStripSet é usada para desenhar tiras de triângulos
     # interconectados, você receberá as coordenadas dos pontos no parâmetro point, esses
-    # pontos são uma lista de pontos x, y, e z sempre na ordem. Assim point[0] é o valor
+    # po-ntos são uma lista de pontos x, y, e z sempre na ordem. Assim point[0] é o valor
     # da coordenada x do primeiro ponto, point[1] o valor y do primeiro ponto, point[2]
     # o valor z da coordenada z do primeiro ponto. Já point[3] é a coordenada x do
     # segundo ponto e assim por diante. No IndexedTriangleStripSet uma lista informando
@@ -643,8 +644,40 @@ def box(size, color):
     # (0, 0, 0) no sistema de coordenadas local e alinhado com os eixos de coordenadas
     # locais. O argumento size especifica as extensões da caixa ao longo dos eixos X, Y
     # e Z, respectivamente, e cada valor do tamanho deve ser maior que zero. Para desenha
-    # essa caixa você vai provavelmente querer tesselar ela em triângulos, para isso
+    # essa /
+    # *+caixa você vai provavelmente querer tesselar ela em triângulos, para isso
     # encontre os vértices e defina os triângulos.
+    x = size[0] / 2
+    y = size[1] / 2
+    z = size[2] / 2
+
+    #VERTICES
+    A= [-x, y, -z]
+    B= [x, y, -z]
+    C= [-x, -y, -z]
+    D= [x, -y, -z]
+    E= [-x, y, z]
+    F= [x, y, z]
+    G= [-x, -y, z]
+    H= [x, -y, z]
+    #TRIANGLES
+    Ts = [
+        [A,B,C],
+        [B,C,D],
+        [B,F,D],
+        [D,F,H],
+        [C,G,D],
+        [D,G,H],
+        [A,C,E],
+        [E,C,G],
+        [A,E,B],
+        [E,B,F],
+        [E,F,G],
+        [G,F,H] ]
+
+    for t in Ts:
+        print(t)
+        triangleSet([ t[0][0], t[0][1], t[0][2], t[1][0], t[1][1], t[1][2], t[2][0], t[2][1], t[2][2] ], color)
 
     # O print abaixo é só para vocês verificarem o funcionamento, deve ser removido.
     print("Box : size = {0}".format(size)) # imprime no terminal pontos
