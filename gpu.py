@@ -50,3 +50,9 @@ class GPU:
         """Método para salvar a imagem do framebuffer em um arquivo. """
         img = Image.fromarray(GPU._frame_buffer, 'RGB')
         img.save(GPU.image_file)
+
+        
+    def get_pixel(u, v):
+        return GPU._frame_buffer[v][u]# retorna a cor do pixel desejada
+        # fizemos essa funcao a mais aqui apra tratar um caso
+
