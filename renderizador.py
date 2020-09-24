@@ -246,7 +246,18 @@ def triangleSet2D(vertices, color):
         drew = draw_pixel(vertices,color,[origin + delta, line])
         if(drew == "OUT OF BOUNDS"):
             Out_of_bounds = True
+            render_count += 1
             print("OUT OF BOUNDS")
+            #I went out of bounds with my triangle. so lets finish the screen with a brute force method for now:
+            if(line < 0):
+                line = 0
+            while line <= lowest and line <= ALTURA:
+                for i in range(LARGURA):
+                    render_count += 1
+                    draw_pixel(vertices,color,[i, line])
+                line += 1
+            #End of nojeira de ultimo caso
+
             continue
         render_count += 1
         #If you want to see this algo running, uncomment this speed if and the first DEBUG line on Draw_pixel (white bg)
@@ -354,7 +365,7 @@ class Procedure():
     #or apply it more than once.
     #It could be added to the operation queue but Having it as a separated thing seems more sane.
     def apply_fov(self, point):
-        print(f"Applying FOV for {point} with fov of {procedure.fov}")
+        #print(f"Applying FOV for {point} with fov of {procedure.fov}")
 
         near = 1
         far = 100
@@ -379,7 +390,7 @@ class Procedure():
         result = result.tolist()
         point = [ result[0][0], result[1][0], result[2][0] ]
 
-        print(point)
+        #print(point)
 
         return point
 
@@ -479,7 +490,7 @@ class Procedure():
             #chamadas em uma stack q seria resolvida da primeira operacao da fila ate a ultima e seria estranho...
             #point = self.operation[op[0]](point, op[1])
         
-        #Versao correta (Pilha)
+        #Versao correta (Pilha) 
         for i in range(self.queue_size -1, -1, -1):
             #chamando a operacao baseada no tipo (dado por op[0]) e passando o ponto e os dados de metada (op[1])
             #cada iteracao atualiza o valor de point, como se fosse uma chamada recursiva
@@ -487,10 +498,10 @@ class Procedure():
             point = self.operation[op[0]](point, op[1])
 
         #Debug and experimentation
+        #I left these lines here to play a little with rotation and scale
+        #and ultimately left the scale at 2.5, for visibility
         point = self.operation["Rotation"](point, [0,0,1,0])
-        point = self.operation["Scale"](point, [1,1,1])
-
-
+        point = self.operation["Scale"](point, [2.5,2.5,2.5])
 
 
         #Applying FOV to each point AFTER all other operations
@@ -524,7 +535,7 @@ def triangleSet(point, color):
     for i in range(0, len(point), 3):
         point_list.append(procedure.run_procedure( [point[i], point[i+1], point[i+2]] ) )
 
-    print("TriangleSet : pontos = {0}".format(point_list)) # imprime no terminal pontos
+    #print("TriangleSet : pontos = {0}".format(point_list)) # imprime no terminal pontos
 
     #converting to uv:
     #(basically ignoring Z as everything is in the camera local space after the procedures)
@@ -533,7 +544,7 @@ def triangleSet(point, color):
         vertices.append(point_list[i][0])
         vertices.append(point_list[i][1])
 
-    print("TriangleSet : uv = {0}".format(vertices)) # imprime no terminal pontos
+    #print("TriangleSet : uv = {0}".format(vertices)) # imprime no terminal pontos
     for i in range(0, len(vertices), 6):
         #render each triangle
         triangleSet2D(vertices[i:i+6],color)
@@ -556,7 +567,7 @@ def viewpoint(position, orientation, fieldOfView):
 
 
     # O print abaixo é só para vocês verificarem o funcionamento, deve ser removido.
-    print("Viewpoint : position = {0}, orientation = {1}, fieldOfView = {2}".format(position, orientation, fieldOfView)) # imprime no terminal
+    #print("Viewpoint : position = {0}, orientation = {1}, fieldOfView = {2}".format(position, orientation, fieldOfView)) # imprime no terminal
 
 def transform(translation, scale, rotation):
     """ Função usada para renderizar (na verdade coletar os dados) de Transform. """
@@ -569,17 +580,17 @@ def transform(translation, scale, rotation):
     # modelos do mundo em alguma estrutura de pilha.
 
     # O print abaixo é só para vocês verificarem o funcionamento, deve ser removido.
-    print("Transform : ", end = '')
+    #print("Transform : ", end = '')
     if translation and not (translation[0] == 0 and translation[1] == 0  and translation[2] == 0):
         procedure.add_operation("Translation", translation)
-        print("translation = {0} ".format(translation), end = '') # imprime no terminal
+        #print("translation = {0} ".format(translation), end = '') # imprime no terminal
     if scale and not (scale[0] == 1 and scale[1] == 1 and scale[2] == 1):
         procedure.add_operation("Scale", scale)
-        print("scale = {0} ".format(scale), end = '') # imprime no terminal
+        #print("scale = {0} ".format(scale), end = '') # imprime no terminal
     if rotation and not (rotation[3] == 0):
         procedure.add_operation("Rotation", rotation)
-        print("rotation = {0} ".format(rotation), end = '') # imprime no terminal
-    print("")
+        #print("rotation = {0} ".format(rotation), end = '') # imprime no terminal
+    #print("")
 
 def _transform():
     """ Função usada para renderizar (na verdade coletar os dados) de Transform. """
@@ -590,7 +601,7 @@ def _transform():
 
     procedure.pop_operation()
     # O print abaixo é só para vocês verificarem o funcionamento, deve ser removido.
-    print("Saindo de Transform")
+    #print("Saindo de Transform")
 
 def triangleStripSet(point, stripCount, color):
     """ Função usada para renderizar TriangleStripSet. """
@@ -601,6 +612,8 @@ def triangleStripSet(point, stripCount, color):
     # coordenada z do primeiro ponto. Já point[3] é a coordenada x do segundo ponto e assim
     # por diante. No TriangleStripSet a quantidade de vértices a serem usados é informado
     # em uma lista chamada stripCount (perceba que é uma lista).
+
+    triangleSet(point, color)
 
     # O print abaixo é só para vocês verificarem o funcionamento, deve ser removido.
     print("TriangleStripSet : pontos = {0} ".format(point), end = '') # imprime no terminal pontos
@@ -645,7 +658,7 @@ if __name__ == '__main__':
     # Valores padrão da aplicação
     width = LARGURA
     height = ALTURA
-    x3d_file = "exemplo5.x3d"
+    x3d_file = "exemplo4.x3d"
     image_file = "tela.png"
 
     # Tratando entrada de parâmetro
